@@ -14,11 +14,11 @@ import (
 )
 
 type ChatGroup struct {
-	Id          int       `json: id`
-	Name        string    `json:name`
-	Description string    `json:description`
-	Sent        time.Time `json: sent`
-	Owner       int       `json: owner`
+	Id          int       `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Sent        time.Time `json:"sent"`
+	Owner       int       `json:"owner"`
 }
 
 func BodyToChatGroup(body []byte) *ChatGroup {
