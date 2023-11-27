@@ -6,6 +6,8 @@ import (
 	"net/http"
 
 	"github.com/facundocarballo/go-chat-app/db"
+	"github.com/facundocarballo/go-chat-app/types"
+	"github.com/facundocarballo/go-chat-app/websocket"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 )
@@ -32,16 +34,36 @@ func main() {
 	}
 
 	// Define handlers to endpoints
-	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		// types.Login(w, r, database)
-	})
-
 	http.HandleFunc("/user", func(w http.ResponseWriter, r *http.Request) {
-		// types.HandleUser(w, r, database)
+		types.HandleUser(w, r, database)
 	})
 
-	http.HandleFunc("/task", func(w http.ResponseWriter, r *http.Request) {
-		// types.HandleTask(w, r, database)
+	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		types.Login(w, r, database)
+	})
+
+	http.HandleFunc("/friend-request", func(w http.ResponseWriter, r *http.Request) {
+		types.HandleFriendRequest(w, r, database)
+	})
+
+	http.HandleFunc("/friends", func(w http.ResponseWriter, r *http.Request) {
+		types.HandleFriends(w, r, database)
+	})
+
+	http.HandleFunc("/group-request", func(w http.ResponseWriter, r *http.Request) {
+		types.HandleGroupRequest(w, r, database)
+	})
+
+	http.HandleFunc("/group", func(w http.ResponseWriter, r *http.Request) {
+		types.HandleGroups(w, r, database)
+	})
+
+	http.HandleFunc("/acept-group", func(w http.ResponseWriter, r *http.Request) {
+		types.AcceptGroupRequest(w, r, database)
+	})
+
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		websocket.HandleWebSocket(w, r)
 	})
 
 	println("Server listening on port" + SERVER_PORT + " ...")
