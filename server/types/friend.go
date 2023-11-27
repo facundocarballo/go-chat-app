@@ -9,13 +9,14 @@ import (
 
 	"github.com/facundocarballo/go-chat-app/crypto"
 	"github.com/facundocarballo/go-chat-app/db"
+	"github.com/facundocarballo/go-chat-app/errors"
 )
 
 type Friend struct {
-	Id    int       `json: id`
-	UserA int       `json: user_a`
-	UserB int       `json: user_b`
-	Sent  time.Time `json: sent`
+	Id    int       `json:"id"`
+	UserA int       `json:"user_a"`
+	UserB int       `json:"user_b"`
+	Sent  time.Time `json:"sent"`
 }
 
 func BodyToFriend(body []byte) *Friend {
@@ -39,25 +40,26 @@ func SendFriendRequest(
 ) bool {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "Error reading the body of request.", http.StatusBadRequest)
+		http.Error(w, errors.READING_BODY_REQ, http.StatusBadRequest)
 		return false
 	}
 	defer r.Body.Close()
 
 	friend := BodyToFriend(body)
 	if friend == nil {
-		http.Error(w, "Error wrapping the body to friend.", http.StatusBadRequest)
+		http.Error(w, errors.UNMARSHAL+" friend.", http.StatusBadRequest)
 		return false
 	}
 
 	tokenString := crypto.GetJWTFromRequest(w, r)
 	if tokenString == nil {
+		http.Error(w, errors.JWT_NOT_FOUND, http.StatusBadRequest)
 		return false
 	}
 
 	id := crypto.GetIdFromJWT(*tokenString)
 	if id == nil {
-		http.Error(w, "Error JWT not Valid", http.StatusBadRequest)
+		http.Error(w, errors.JWT_INVALID, http.StatusBadRequest)
 		return false
 	}
 
@@ -69,7 +71,7 @@ func SendFriendRequest(
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Error creating the user in the database. " + err.Error()))
+		w.Write([]byte(errors.INSERT_DB + " " + err.Error()))
 		return false
 	}
 
@@ -79,7 +81,7 @@ func SendFriendRequest(
 	resJSON := GetResponseDataJSON(resData)
 
 	if resJSON == nil {
-		http.Error(w, "Error converting the response data to JSON. ", http.StatusInternalServerError)
+		http.Error(w, errors.DATA_TO_JSON, http.StatusInternalServerError)
 		return false
 	}
 
@@ -96,25 +98,26 @@ func AcceptFriendRequest(
 ) bool {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "Error reading the body of request.", http.StatusBadRequest)
+		http.Error(w, errors.READING_BODY_REQ, http.StatusBadRequest)
 		return false
 	}
 	defer r.Body.Close()
 
 	friend := BodyToFriend(body)
 	if friend == nil {
-		http.Error(w, "Error wrapping the body to friend.", http.StatusBadRequest)
+		http.Error(w, errors.UNMARSHAL+" friend.", http.StatusBadRequest)
 		return false
 	}
 
 	tokenString := crypto.GetJWTFromRequest(w, r)
 	if tokenString == nil {
+		http.Error(w, errors.JWT_NOT_FOUND, http.StatusBadRequest)
 		return false
 	}
 
 	id := crypto.GetIdFromJWT(*tokenString)
 	if id == nil {
-		http.Error(w, "Error JWT not Valid", http.StatusBadRequest)
+		http.Error(w, errors.JWT_INVALID, http.StatusBadRequest)
 		return false
 	}
 
@@ -126,14 +129,14 @@ func AcceptFriendRequest(
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Error creating the user in the database. " + err.Error()))
+		w.Write([]byte(errors.INSERT_DB + " " + err.Error()))
 		return false
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Error reading rows affected. " + err.Error()))
+		w.Write([]byte(errors.READING_ROWS_AFFECTED + " " + err.Error()))
 		return false
 	}
 
@@ -164,12 +167,13 @@ func GetFriendRequests(
 ) bool {
 	tokenString := crypto.GetJWTFromRequest(w, r)
 	if tokenString == nil {
+		http.Error(w, errors.JWT_NOT_FOUND, http.StatusBadRequest)
 		return false
 	}
 
 	id := crypto.GetIdFromJWT(*tokenString)
 	if id == nil {
-		http.Error(w, "Error JWT not Valid", http.StatusBadRequest)
+		http.Error(w, errors.JWT_INVALID, http.StatusBadRequest)
 		return false
 	}
 
@@ -224,7 +228,7 @@ func GetFriends(
 
 	id := crypto.GetIdFromJWT(*tokenString)
 	if id == nil {
-		http.Error(w, "Error JWT not Valid", http.StatusBadRequest)
+		http.Error(w, errors.JWT_INVALID, http.StatusBadRequest)
 		return false
 	}
 

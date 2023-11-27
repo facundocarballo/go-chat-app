@@ -9,6 +9,7 @@ import (
 
 	"github.com/facundocarballo/go-chat-app/crypto"
 	"github.com/facundocarballo/go-chat-app/db"
+	"github.com/facundocarballo/go-chat-app/errors"
 )
 
 type User struct {
@@ -34,7 +35,7 @@ func BodyToUser(body []byte) *User {
 }
 
 func GetAllUsers(w http.ResponseWriter, database *sql.DB) []User {
-	rows, err := database.Query("SELECT id, name, email FROM User")
+	rows, err := database.Query(db.GET_USERS)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -73,14 +74,14 @@ func CreateUser(
 ) bool {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "Error reading the body of request.", http.StatusBadRequest)
+		http.Error(w, errors.READING_BODY_REQ, http.StatusBadRequest)
 		return false
 	}
 	defer r.Body.Close()
 
 	user := BodyToUser(body)
 	if user == nil {
-		http.Error(w, "Error wrapping the body to user.", http.StatusBadRequest)
+		http.Error(w, errors.UNMARSHAL+" user", http.StatusBadRequest)
 		return false
 	}
 
@@ -93,7 +94,7 @@ func CreateUser(
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Error creating the user in the database. " + err.Error()))
+		w.Write([]byte(errors.INSERT_DB + err.Error()))
 		return false
 	}
 
@@ -105,7 +106,7 @@ func CreateUser(
 	resJSON := GetResponseDataJSON(resData)
 
 	if resJSON == nil {
-		http.Error(w, "Error converting the response data to JSON. ", http.StatusInternalServerError)
+		http.Error(w, errors.DATA_TO_JSON, http.StatusInternalServerError)
 		return false
 	}
 
@@ -116,7 +117,7 @@ func CreateUser(
 }
 
 func GetUserFromEmail(email string, w http.ResponseWriter, database *sql.DB) *User {
-	rows, err := database.Query("SELECT id, name, email, password FROM User WHERE email = (?)", email)
+	rows, err := database.Query(db.GET_USER_BY_EMAIL, email)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -147,14 +148,14 @@ func Login(
 ) bool {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "Error reading the body of request.", http.StatusBadRequest)
+		http.Error(w, errors.READING_BODY_REQ, http.StatusBadRequest)
 		return false
 	}
 	defer r.Body.Close()
 
 	user := BodyToUser(body)
 	if user == nil {
-		http.Error(w, "Error wrapping the body to user.", http.StatusBadRequest)
+		http.Error(w, errors.UNMARSHAL, http.StatusBadRequest)
 		return false
 	}
 
@@ -162,13 +163,13 @@ func Login(
 	realUser := GetUserFromEmail(user.Email, w, database)
 	if realUser == nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("User email not found."))
+		w.Write([]byte(errors.ELEMENT_NOT_FOUND))
 		return false
 	}
 
 	if realUser.Password != user.Password {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Passwords not match."))
+		w.Write([]byte(errors.PASSWORDS_NOT_MATCH))
 		return false
 	}
 
@@ -180,7 +181,7 @@ func Login(
 	resJSON := GetResponseDataJSON(resData)
 
 	if resJSON == nil {
-		http.Error(w, "Error converting the response data to JSON. ", http.StatusInternalServerError)
+		http.Error(w, errors.DATA_TO_JSON, http.StatusInternalServerError)
 		return false
 	}
 

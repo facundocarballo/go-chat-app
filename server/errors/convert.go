@@ -1,6 +1,5 @@
 package errors
 
-const READING_BODY_REQ = "Error reading the body of request."
 const UNMARSHAL = "Error unmarshal the bytes of the body to "
 
 const PARSE_FROM = "Error parsing the form."

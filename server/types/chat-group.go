@@ -62,7 +62,7 @@ func CreateGroup(
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Error creating the user in the database. " + err.Error()))
+		w.Write([]byte(errors.INSERT_DB + err.Error()))
 		return false
 	}
 
@@ -89,14 +89,14 @@ func SendGroupRequest(
 ) bool {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "Error reading the body of request.", http.StatusBadRequest)
+		http.Error(w, errors.READING_BODY_REQ, http.StatusBadRequest)
 		return false
 	}
 	defer r.Body.Close()
 
 	chatGroup := BodyToChatGroup(body)
 	if chatGroup == nil {
-		http.Error(w, "Error wrapping the body to ChatGroup.", http.StatusBadRequest)
+		http.Error(w, errors.UNMARSHAL+" ChatGroup", http.StatusBadRequest)
 		return false
 	}
 
@@ -119,7 +119,7 @@ func SendGroupRequest(
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Error creating the group request in the database. " + err.Error()))
+		w.Write([]byte(errors.INSERT_DB + err.Error()))
 		return false
 	}
 
@@ -129,7 +129,7 @@ func SendGroupRequest(
 	resJSON := GetResponseDataJSON(resData)
 
 	if resJSON == nil {
-		http.Error(w, "Error converting the response data to JSON. ", http.StatusInternalServerError)
+		http.Error(w, errors.DATA_TO_JSON, http.StatusInternalServerError)
 		return false
 	}
 
@@ -146,14 +146,14 @@ func AcceptGroupRequest(
 ) bool {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "Error reading the body of request.", http.StatusBadRequest)
+		http.Error(w, errors.READING_BODY_REQ, http.StatusBadRequest)
 		return false
 	}
 	defer r.Body.Close()
 
 	chatGroup := BodyToChatGroup(body)
 	if chatGroup == nil {
-		http.Error(w, "Error wrapping the body to Chat Group.", http.StatusBadRequest)
+		http.Error(w, errors.UNMARSHAL+" ChatGroup", http.StatusBadRequest)
 		return false
 	}
 
@@ -178,14 +178,14 @@ func AcceptGroupRequest(
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Error creating the group request in the database. " + err.Error()))
+		w.Write([]byte(errors.INSERT_DB + err.Error()))
 		return false
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Error reading rows affected. " + err.Error()))
+		w.Write([]byte(errors.READING_ROWS_AFFECTED + " " + err.Error()))
 		return false
 	}
 
@@ -198,7 +198,7 @@ func AcceptGroupRequest(
 	resJSON := GetResponseDataJSON(resData)
 
 	if resJSON == nil {
-		http.Error(w, "Error converting the response data to JSON. ", http.StatusInternalServerError)
+		http.Error(w, errors.DATA_TO_JSON, http.StatusInternalServerError)
 		return false
 	}
 

@@ -2,6 +2,8 @@ package db
 
 // User
 const INSERT_USER_STATEMENT = "INSERT INTO User (name, email, password) VALUES (?, ?, ?)"
+const GET_USERS = "SELECT id, name, email FROM User"
+const GET_USER_BY_EMAIL = "SELECT id, name, email, password FROM User WHERE email = (?)"
 
 // Friend Request
 const INSERT_FRIEND_REQUEST = "INSERT INTO FriendRequest (user_a, user_b) VALUES (?, ?)"
