@@ -1,10 +1,13 @@
 package websocket
 
 import (
-	"fmt"
+	"encoding/json"
+	"log"
 	"net/http"
 
+	"github.com/facundocarballo/go-chat-app/crypto"
 	"github.com/facundocarballo/go-chat-app/errors"
+	"github.com/facundocarballo/go-chat-app/types"
 	"github.com/gorilla/websocket"
 )
 
@@ -14,32 +17,67 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+var clients = make(map[*types.Client]bool)
+var broadcast = make(chan *types.Message)
+
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+	tokenString := r.URL.Query().Get("jwt")
+
+	id := crypto.GetIdFromJWT(tokenString)
+	if id == nil {
+		http.Error(w, errors.JWT_INVALID, http.StatusBadRequest)
+		return
+	}
+
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		http.Error(w, errors.UPGRADE_FAILED, http.StatusBadRequest)
 		return
 	}
-	defer conn.Close()
 
-	println("Client Connected...")
+	client := types.CreateClient(conn, *id)
+	clients[client] = true
+
+	defer func() {
+		conn.Close()
+		delete(clients, client)
+	}()
 
 	for {
-		// Lee el mensaje del cliente
-		messageType, p, err := conn.ReadMessage()
+		_, p, err := conn.ReadMessage()
 		if err != nil {
 			println(err)
 			return
 		}
+		message := types.BodyToMessage(p)
+		// TODO: Insert message to database
+		broadcast <- message
+	}
+}
 
-		// Imprime el mensaje recibido
-		print("Mensaje recibido: %s\n", p)
+func HandleMessages() {
+	for {
+		// Obtener el próximo mensaje del canal de difusión
+		message := <-broadcast
 
-		// Escribe el mensaje de vuelta al cliente
-		err = conn.WriteMessage(messageType, p)
-		if err != nil {
-			fmt.Println(err)
-			return
+		// TODO: Chequear si el mensaje es para un grupo
+
+		// Enviar el mensaje a todos los clientes conectados
+		for client := range clients {
+			if message.Id == client.Id {
+				b, err := json.Marshal(message)
+				if err != nil {
+					log.Println(err)
+					client.Conn.Close()
+					delete(clients, client)
+				}
+				err = client.Conn.WriteMessage(websocket.TextMessage, b)
+				if err != nil {
+					log.Println(err)
+					client.Conn.Close()
+					delete(clients, client)
+				}
+			}
 		}
 	}
 }
