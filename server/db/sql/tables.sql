@@ -5,11 +5,11 @@ CREATE TABLE User (
 	id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255),
     email VARCHAR(255) UNIQUE,
-	sent DATE DEFAULT CURRENT_TIMESTAMP,
+	created_at DATE DEFAULT CURRENT_TIMESTAMP,
     password VARCHAR(255)
 );
 
-CREATE TABLE InvitationFriend (
+CREATE TABLE FriendRequest (
 	id INT AUTO_INCREMENT PRIMARY KEY,
     user_a INT,
     user_b INT,
@@ -36,7 +36,7 @@ CREATE TABLE ChatGroup (
     FOREIGN KEY (owner) REFERENCES User(id)
 );
 
-CREATE TABLE InvitationGroup (
+CREATE TABLE GroupRequest (
 	id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     group_id INT,
@@ -72,3 +72,4 @@ CREATE TABLE UserMessage (
 	FOREIGN KEY (user_from) REFERENCES User(id),
     FOREIGN KEY (user_to) REFERENCES User(id)
 );
+
