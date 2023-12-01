@@ -5,6 +5,8 @@ const INSERT_USER_STATEMENT = "INSERT INTO User (name, email, password) VALUES (
 const GET_USERS = "SELECT id, name, email FROM User"
 const GET_USER_BY_EMAIL = "SELECT id, name, email, password FROM User WHERE email = (?)"
 
+const INSERT_USER_MESSAGE = "CALL InsertUserMessage(?, ?, ?)"
+
 // Friend Request
 const INSERT_FRIEND_REQUEST = "INSERT INTO FriendRequest (user_a, user_b) VALUES (?, ?)"
 const ACCEPT_FRINED_REQUEST = "CALL AcceptFriendRequest(?, ?)"
@@ -25,3 +27,6 @@ const GET_GROUP_REQUEST_SENTED = "SELECT id, user_id, group_id, sent FROM GroupR
 // Groups
 const INSERT_GROUP = "INSERT INTO ChatGroup (name, description, owner) VALUES (?, ?, ?)"
 const GET_GROUPS = "SELECT id, name, description, sent, owner FROM ChatGroup"
+const GET_GROUPS_OF_USER = "SELECT id FROM ChatGroup WHERE owner = (?)"
+
+const INSERT_GROUP_MESSAGE = "CALL InsertGroupMessage(?, ?, ?)"

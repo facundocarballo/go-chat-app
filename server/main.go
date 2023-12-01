@@ -63,7 +63,7 @@ func main() {
 	})
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		websocket.HandleWebSocket(w, r)
+		websocket.HandleWebSocket(w, r, database)
 	})
 
 	go websocket.HandleMessages()

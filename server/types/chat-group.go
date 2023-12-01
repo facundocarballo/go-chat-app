@@ -327,6 +327,32 @@ func GetGroups(
 	return true
 }
 
+func GetGropusOfUser(id int, database *sql.DB) []int {
+	rows, err := database.Query(db.GET_GROUPS_OF_USER, id)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rows.Close()
+
+	// Iterate Rows
+	var chatGroups []int
+	for rows.Next() {
+		var chatId int
+		err := rows.Scan(&chatId)
+		if err != nil {
+			return nil
+		}
+		chatGroups = append(chatGroups, chatId)
+	}
+
+	// Check Error on Rows
+	if err := rows.Err(); err != nil {
+		return nil
+	}
+
+	return chatGroups
+}
+
 func HandleGroupRequest(w http.ResponseWriter, r *http.Request, database *sql.DB) {
 	if r.Method == http.MethodPost {
 		SendGroupRequest(w, r, database)
