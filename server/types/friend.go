@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/facundocarballo/go-chat-app/crypto"
@@ -163,7 +164,6 @@ func GetFriendRequests(
 	w http.ResponseWriter,
 	r *http.Request,
 	database *sql.DB,
-	sented bool,
 ) bool {
 	tokenString := crypto.GetJWTFromRequest(w, r)
 	if tokenString == nil {
@@ -174,6 +174,15 @@ func GetFriendRequests(
 	id := crypto.GetIdFromJWT(*tokenString)
 	if id == nil {
 		http.Error(w, errors.JWT_INVALID, http.StatusBadRequest)
+		return false
+	}
+
+	queryParams := r.URL.Query()
+
+	sentedString := queryParams.Get("sented")
+	sented, err := strconv.ParseBool(sentedString)
+	if err != nil {
+		http.Error(w, errors.SENTED_NOT_VALID, http.StatusBadRequest)
 		return false
 	}
 
@@ -271,9 +280,7 @@ func HandleFriendRequest(w http.ResponseWriter, r *http.Request, database *sql.D
 	}
 
 	if r.Method == http.MethodGet {
-		// Get all the friend requests received
-		// TODO: Read from a parameter if the client wants the friend requests sented or the received
-		GetFriendRequests(w, r, database, false)
+		GetFriendRequests(w, r, database)
 		return
 	}
 

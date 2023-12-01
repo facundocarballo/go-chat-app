@@ -168,7 +168,11 @@ func AcceptGroupRequest(
 		return false
 	}
 
-	// TODO: Chequear que sea el owner del grupo
+	owner := GetGroupOwner(chatGroup.Id, database)
+	if *id != *owner {
+		http.Error(w, errors.NOT_GROUP_OWNER, http.StatusBadRequest)
+		return false
+	}
 
 	result, err := database.Exec(
 		db.ACCEPT_FRINED_REQUEST,
@@ -325,6 +329,29 @@ func GetGroups(
 	json.NewEncoder(w).Encode(chatGroups)
 
 	return true
+}
+
+func GetGroupOwner(id int, database *sql.DB) *int {
+	rows, err := database.Query(db.GET_GROUP_OWNER, id)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rows.Close()
+
+	// Iterate Rows
+	rows.Next()
+	var chatId int
+	err = rows.Scan(&chatId)
+	if err != nil {
+		return nil
+	}
+
+	// Check Error on Rows
+	if err := rows.Err(); err != nil {
+		return nil
+	}
+
+	return &chatId
 }
 
 func GetGropusOfUser(id int, database *sql.DB) []int {

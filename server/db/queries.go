@@ -28,5 +28,6 @@ const GET_GROUP_REQUEST_SENTED = "SELECT id, user_id, group_id, sent FROM GroupR
 const INSERT_GROUP = "INSERT INTO ChatGroup (name, description, owner) VALUES (?, ?, ?)"
 const GET_GROUPS = "SELECT id, name, description, sent, owner FROM ChatGroup"
 const GET_GROUPS_OF_USER = "SELECT id FROM ChatGroup WHERE owner = (?)"
+const GET_GROUP_OWNER = "SELECT owner FROM ChatGroup WHERE id = (?)"
 
 const INSERT_GROUP_MESSAGE = "CALL InsertGroupMessage(?, ?, ?)"
