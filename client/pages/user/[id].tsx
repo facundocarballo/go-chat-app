@@ -1,7 +1,7 @@
 import Head from "next/head";
 import React from "react";
 import { useProvider } from "@/src/context";
-import { Box, Divider, HStack, Heading, VStack } from "@chakra-ui/react";
+import { Box, Divider, Heading, VStack } from "@chakra-ui/react";
 import { User } from "@/src/models/user";
 import { useRouter } from "next/router";
 import { InputMessage } from "@/src/components/InputMessage";
@@ -19,8 +19,6 @@ export default function Friend() {
   // Methods
   const handleGetFriend = () => {
     if (!user || !user.friends) {
-      console.log("User: ", user);
-      console.log("Friends: ", user?.friends);
       return;
     }
     for (const f of user.friends) {

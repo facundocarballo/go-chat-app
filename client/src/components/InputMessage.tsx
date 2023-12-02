@@ -1,5 +1,5 @@
 import { ArrowForwardIcon } from "@chakra-ui/icons";
-import { Button, HStack, Input, Spacer, Box, VStack } from "@chakra-ui/react";
+import { Button, HStack, Input, Box, VStack } from "@chakra-ui/react";
 import React from "react";
 
 export const InputMessage = () => {
