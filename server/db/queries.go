@@ -8,14 +8,14 @@ const GET_USER_BY_EMAIL = "SELECT id, name, email, password FROM User WHERE emai
 const INSERT_USER_MESSAGE = "CALL InsertUserMessage(?, ?, ?)"
 
 // Friend Request
-const INSERT_FRIEND_REQUEST = "INSERT INTO FriendRequest (user_a, user_b) VALUES (?, ?)"
+const INSERT_FRIEND_REQUEST = "CALL CreateFriendRequest(?, ?)"
 const ACCEPT_FRINED_REQUEST = "CALL AcceptFriendRequest(?, ?)"
 
 const GET_FRIEND_REQUEST_RECEIVED = "SELECT id, user_a, user_b, sent FROM FriendRequest WHERE user_b = (?)"
 const GET_FRIEND_REQUEST_SENTED = "SELECT id, user_a, user_b, sent FROM FriendRequest WHERE user_a = (?)"
 
 // Friends
-const GET_FRIENDS = "SELECT id, user_a, user_b, sent FROM Friend WHERE user_a = (?) OR user_b = (?)"
+const GET_FRIENDS = "SELECT id, user_a, user_b, start_friendship FROM Friend WHERE user_a = (?) OR user_b = (?)"
 
 // Group Request
 const INSERT_GROUP_REQUEST = "INSERT INTO GroupRequest (user_id, group_id) VALUES (?, ?)"

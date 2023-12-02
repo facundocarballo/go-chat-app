@@ -85,12 +85,23 @@ func CreateUser(
 		return false
 	}
 
-	_, err = database.Exec(
+	result, err := database.Exec(
 		db.INSERT_USER_STATEMENT,
 		user.Name,
 		user.Email,
 		user.Password,
 	)
+	// TODO: Modify this error message.
+	if err != nil {
+		http.Error(w, errors.GETTING_LAST_ID_INSERTED, http.StatusBadRequest)
+		return false
+	}
+
+	newUserId, err := result.LastInsertId()
+	if err != nil {
+		http.Error(w, errors.GETTING_LAST_ID_INSERTED, http.StatusBadRequest)
+		return false
+	}
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -98,7 +109,7 @@ func CreateUser(
 		return false
 	}
 
-	tokenString := crypto.GenerateJWT(user.Id)
+	tokenString := crypto.GenerateJWT(int(newUserId))
 
 	resData := ResponseData{
 		Message: *tokenString,

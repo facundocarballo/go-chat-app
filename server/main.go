@@ -46,6 +46,10 @@ func main() {
 		types.HandleFriendRequest(w, r, database)
 	})
 
+	http.HandleFunc("/accept-friend", func(w http.ResponseWriter, r *http.Request) {
+		types.HandleAcceptFriend(w, r, database)
+	})
+
 	http.HandleFunc("/friends", func(w http.ResponseWriter, r *http.Request) {
 		types.HandleFriends(w, r, database)
 	})

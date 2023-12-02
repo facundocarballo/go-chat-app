@@ -1,0 +1,6 @@
+JWTs
+-----
+facu@gmail.com => eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MX0.XF3YG1m_vtJDN6tfO5iKWgZdpIcFgXnpG_fuDVBn0Uc
+gonzalo@gmail.com => eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mn0.9V8wKqOWNIi1WGMmzuhqv1jvDlLW9B7jjJisAV1OvPg
+luci@gmail.com => eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6M30.1qmoIT5HL0HA7PNzXykGC1YbjBmnAelbEl4X77U1-Ig
+-----

@@ -17,7 +17,7 @@ END //
 DELIMITER ;
 
 DELIMITER //
-CREATE PROCEDURE AcceptFriendRequest(IN user_a INT, IN user_b INT)
+CREATE PROCEDURE AcceptFriendRequest(IN user_a INT, IN user_b INT, OUT amount INT)
 BEGIN
 	DECLARE amount INT;
     
@@ -33,6 +33,8 @@ BEGIN
         WHERE FriendRequest.user_a = user_a
         AND FriendRequest.user_b = user_b;
 	END IF;
+    
+    RETURN amount;
 END //
 DELIMITER ;
 

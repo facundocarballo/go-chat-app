@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/facundocarballo/go-chat-app/crypto"
 	"github.com/facundocarballo/go-chat-app/db"
@@ -14,10 +13,10 @@ import (
 )
 
 type Friend struct {
-	Id    int       `json:"id"`
-	UserA int       `json:"user_a"`
-	UserB int       `json:"user_b"`
-	Sent  time.Time `json:"sent"`
+	Id    int    `json:"id"`
+	UserA int    `json:"user_a"`
+	UserB int    `json:"user_b"`
+	Sent  string `json:"sent"`
 }
 
 func BodyToFriend(body []byte) *Friend {
@@ -124,8 +123,8 @@ func AcceptFriendRequest(
 
 	result, err := database.Exec(
 		db.ACCEPT_FRINED_REQUEST,
+		friend.UserA,
 		*id,
-		friend.UserB,
 	)
 
 	if err != nil {
@@ -141,7 +140,9 @@ func AcceptFriendRequest(
 		return false
 	}
 
-	// TODO: Chequear cuantas filas se afectan cuando no se produce la aceptacion de la solicitud de amistad.
+	// Las filas afectadas dan siempre 1, sea cual sea el resultado.
+	// Es decir, no podemos identificar cuando se acepta realmente un amigo
+	// o cuando no se puede aceptar porque no existe la solicitud.
 	println("Filas afectadas: ", rowsAffected)
 
 	resData := ResponseData{
@@ -203,7 +204,9 @@ func GetFriendRequests(
 	var friends []Friend
 	for rows.Next() {
 		var friend Friend
-		err := rows.Scan(&friend.Id, &friend.UserA, &friend.UserB, &friend.Sent)
+		var sentBytes []uint8
+		err := rows.Scan(&friend.Id, &friend.UserA, &friend.UserB, &sentBytes)
+		friend.Sent = string(sentBytes)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return false
@@ -251,7 +254,9 @@ func GetFriends(
 	var friends []Friend
 	for rows.Next() {
 		var friend Friend
-		err := rows.Scan(&friend.Id, &friend.UserA, &friend.UserB, &friend.Sent)
+		var sentBytes []uint8
+		err := rows.Scan(&friend.Id, &friend.UserA, &friend.UserB, &sentBytes)
+		friend.Sent = string(sentBytes)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return false
@@ -293,6 +298,10 @@ func HandleFriends(w http.ResponseWriter, r *http.Request, database *sql.DB) {
 		return
 	}
 
+	http.Error(w, "Method not allowed to /friends", http.StatusMethodNotAllowed)
+}
+
+func HandleAcceptFriend(w http.ResponseWriter, r *http.Request, database *sql.DB) {
 	if r.Method == http.MethodPost {
 		AcceptFriendRequest(w, r, database)
 		return
