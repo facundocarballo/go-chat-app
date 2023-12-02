@@ -3,7 +3,8 @@ package db
 // User
 const INSERT_USER_STATEMENT = "INSERT INTO User (name, email, password) VALUES (?, ?, ?)"
 const GET_USERS = "SELECT id, name, email FROM User"
-const GET_USER_BY_EMAIL = "SELECT id, name, email, password FROM User WHERE email = (?)"
+const GET_USER_BY_EMAIL = "SELECT * FROM User WHERE email = (?)"
+const GET_USER_BY_ID = "SELECT id, name, email, created_at FROM User WHERE id = (?)"
 
 const INSERT_USER_MESSAGE = "CALL InsertUserMessage(?, ?, ?)"
 

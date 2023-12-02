@@ -13,10 +13,10 @@ import (
 )
 
 type Friend struct {
-	Id    int    `json:"id"`
-	UserA int    `json:"user_a"`
-	UserB int    `json:"user_b"`
-	Sent  string `json:"sent"`
+	Id              int    `json:"id"`
+	UserA           int    `json:"user_a"`
+	UserB           int    `json:"user_b"`
+	StartFriendship string `json:"start_friendship"`
 }
 
 func BodyToFriend(body []byte) *Friend {
@@ -206,7 +206,7 @@ func GetFriendRequests(
 		var friend Friend
 		var sentBytes []uint8
 		err := rows.Scan(&friend.Id, &friend.UserA, &friend.UserB, &sentBytes)
-		friend.Sent = string(sentBytes)
+		friend.StartFriendship = string(sentBytes)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return false
@@ -256,7 +256,7 @@ func GetFriends(
 		var friend Friend
 		var sentBytes []uint8
 		err := rows.Scan(&friend.Id, &friend.UserA, &friend.UserB, &sentBytes)
-		friend.Sent = string(sentBytes)
+		friend.StartFriendship = string(sentBytes)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return false

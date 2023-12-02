@@ -9,6 +9,7 @@ import (
 	"github.com/facundocarballo/go-chat-app/types"
 	"github.com/facundocarballo/go-chat-app/websocket"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
 )
 
@@ -70,8 +71,17 @@ func main() {
 		websocket.HandleWebSocket(w, r, database)
 	})
 
+	corsMiddleware := handlers.CORS(
+		handlers.AllowedOrigins([]string{"http://localhost:3000"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"}),
+		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
+		handlers.AllowCredentials(),
+	)
+
 	go websocket.HandleMessages()
 
 	println("Server listening on port" + SERVER_PORT + " ...")
-	http.ListenAndServe(SERVER_PORT, nil)
+	if err := http.ListenAndServe(SERVER_PORT, corsMiddleware(http.DefaultServeMux)); err != nil {
+		panic(err)
+	}
 }

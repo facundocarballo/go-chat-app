@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"time"
+	"strconv"
 
 	"github.com/facundocarballo/go-chat-app/crypto"
 	"github.com/facundocarballo/go-chat-app/db"
@@ -13,11 +13,11 @@ import (
 )
 
 type User struct {
-	Id        int       `json:"id"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	CreatedAt time.Time `json:"created_at"`
-	Password  string    `json:"password"`
+	Id        int    `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	CreatedAt string `json:"created_at"`
+	Password  string `json:"password"`
 }
 
 func BodyToUser(body []byte) *User {
@@ -127,6 +127,31 @@ func CreateUser(
 	return true
 }
 
+func GetUserFromId(id int, w http.ResponseWriter, database *sql.DB) *User {
+	rows, err := database.Query(db.GET_USER_BY_ID, id)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rows.Close()
+
+	// Iterate Rows
+	rows.Next()
+	var user User
+	err = rows.Scan(&user.Id, &user.Name, &user.Email, &user.CreatedAt)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return nil
+	}
+
+	// Check Error on Rows
+	if err := rows.Err(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return nil
+	}
+
+	return &user
+}
+
 func GetUserFromEmail(email string, w http.ResponseWriter, database *sql.DB) *User {
 	rows, err := database.Query(db.GET_USER_BY_EMAIL, email)
 	if err != nil {
@@ -137,7 +162,7 @@ func GetUserFromEmail(email string, w http.ResponseWriter, database *sql.DB) *Us
 	// Iterate Rows
 	rows.Next()
 	var user User
-	err = rows.Scan(&user.Id, &user.Name, &user.Email, &user.Password)
+	err = rows.Scan(&user.Id, &user.Name, &user.Email, &user.CreatedAt, &user.Password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return nil
@@ -184,12 +209,16 @@ func Login(
 		return false
 	}
 
+	realUser.Password = ""
+
 	tokenString := crypto.GenerateJWT(realUser.Id)
 
-	resData := ResponseData{
-		Message: *tokenString,
+	resData := ResponseLogin{
+		Jwt:      *tokenString,
+		RealUser: *realUser,
 	}
-	resJSON := GetResponseDataJSON(resData)
+
+	resJSON := GetResponseLoginJSON(resData)
 
 	if resJSON == nil {
 		http.Error(w, errors.DATA_TO_JSON, http.StatusInternalServerError)
@@ -202,6 +231,31 @@ func Login(
 	return true
 }
 
+func GetParticularUser(
+	idString string,
+	w http.ResponseWriter,
+	r *http.Request,
+	database *sql.DB,
+) bool {
+	id, err := strconv.Atoi(idString)
+	if err != nil {
+		http.Error(w, errors.ATOI, http.StatusBadRequest)
+		return false
+	}
+
+	user := GetUserFromId(id, w, database)
+	if user == nil {
+		http.Error(w, errors.ELEMENT_NOT_FOUND, http.StatusBadRequest)
+		return false
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(*user)
+
+	return true
+}
+
 func HandleUser(w http.ResponseWriter, r *http.Request, database *sql.DB) {
 	if r.Method == http.MethodPost {
 		CreateUser(w, r, database)
@@ -209,7 +263,14 @@ func HandleUser(w http.ResponseWriter, r *http.Request, database *sql.DB) {
 	}
 
 	if r.Method == http.MethodGet {
-		GetAllUsers(w, database)
+		queryParams := r.URL.Query()
+		id := queryParams.Get("id")
+		if id == "" {
+			GetAllUsers(w, database)
+		} else {
+			GetParticularUser(id, w, r, database)
+		}
+
 		return
 	}
 
