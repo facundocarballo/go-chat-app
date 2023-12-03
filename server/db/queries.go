@@ -24,13 +24,16 @@ const GET_FRIENDS = "SELECT id, user_a, user_b, start_friendship FROM Friend WHE
 const INSERT_GROUP_REQUEST = "INSERT INTO GroupRequest (user_id, group_id) VALUES (?, ?)"
 const ACCEPT_GROUP_REQUEST = "CALL AcceptGroupRequest(?, ?)"
 
-const GET_GROUP_REQUEST_RECEIVED = "SELECT id, user_id, group_id, sent FROM GroupRequest WHERE group_id = (?)"
-const GET_GROUP_REQUEST_SENTED = "SELECT id, user_id, group_id, sent FROM GroupRequest WHERE user_id = (?)"
+const GET_GROUP_REQUEST_RECEIVED = "SELECT * FROM GroupRequest WHERE group_id = (?)"
+const GET_GROUP_REQUEST_SENTED = "SELECT * FROM GroupRequest WHERE user_id = (?)"
 
 // Groups
-const INSERT_GROUP = "INSERT INTO ChatGroup (name, description, owner) VALUES (?, ?, ?)"
+const CREATE_GROUP = "CALL CreateChatGroup(?, ?, ?)"
 const GET_GROUPS = "SELECT id, name, description, sent, owner FROM ChatGroup"
 const GET_GROUPS_OF_USER = "SELECT id FROM ChatGroup WHERE owner = (?)"
 const GET_GROUP_OWNER = "SELECT owner FROM ChatGroup WHERE id = (?)"
 
 const INSERT_GROUP_MESSAGE = "CALL InsertGroupMessage(?, ?, ?)"
+
+// Group Messages
+const GET_GROUP_MESSAGES = "SELECT * FROM GroupMessage WHERE group_id = (?)"

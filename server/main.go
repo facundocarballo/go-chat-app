@@ -65,11 +65,15 @@ func main() {
 		types.HandleGroups(w, r, database)
 	})
 
-	http.HandleFunc("/acept-group", func(w http.ResponseWriter, r *http.Request) {
-		types.AcceptGroupRequest(w, r, database)
+	http.HandleFunc("/accept-group", func(w http.ResponseWriter, r *http.Request) {
+		types.HandleAcceptGroupRequest(w, r, database)
 	})
 
 	http.HandleFunc("/user-message", func(w http.ResponseWriter, r *http.Request) {
+		types.HandleUserMessage(w, r, database)
+	})
+
+	http.HandleFunc("/group-message", func(w http.ResponseWriter, r *http.Request) {
 		types.HandleUserMessage(w, r, database)
 	})
 

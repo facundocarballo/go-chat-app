@@ -1,3 +1,33 @@
+
+DELIMITER //
+CREATE PROCEDURE CreateUser(IN _name TEXT, IN email TEXT, IN _password TEXT, OUT id INT)
+BEGIN
+	DECLARE newUserId INT;
+	INSERT INTO User 
+    (name, email, password) 
+    VALUES (_name, email, _password);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE CreateChatGroup(IN _name TEXT, IN _description TEXT, IN _owner INT)
+BEGIN	
+	DECLARE newGroupId INT;
+    INSERT INTO ChatGroup (name, description, owner) VALUES (_name, _description, _owner);
+    SET newGroupId = last_insert_id();
+    INSERT INTO UserChatGroup (user_id, group_id) VALUES (_owner, newGroupId);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE CreateFriendRequest(IN user_a INT, IN user_b INT)
+BEGIN
+	INSERT INTO FriendRequest 
+    (user_a, user_b) 
+    VALUES (user_a, user_b);
+END //
+DELIMITER ;
+
 DELIMITER //
 CREATE PROCEDURE InsertUserMessage(IN user_a INT, IN user_b INT, IN message TEXT)
 BEGIN

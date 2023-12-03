@@ -48,6 +48,81 @@ func HandleUserMessage(
 	http.Error(w, "Method not allowed to /user-message", http.StatusMethodNotAllowed)
 }
 
+func HandleGroupMessage(
+	w http.ResponseWriter,
+	r *http.Request,
+	database *sql.DB,
+) {
+	if r.Method == http.MethodGet {
+		GetGroupMessage(w, r, database)
+		return
+	}
+
+	http.Error(w, "Method not allowed to /group-message", http.StatusMethodNotAllowed)
+}
+
+func GetGroupMessage(
+	w http.ResponseWriter,
+	r *http.Request,
+	database *sql.DB,
+) bool {
+	tokenString := crypto.GetJWTFromRequest(w, r)
+	if tokenString == nil {
+		http.Error(w, errors.JWT_NOT_FOUND, http.StatusBadRequest)
+		return false
+	}
+
+	id := crypto.GetIdFromJWT(*tokenString)
+	if id == nil {
+		http.Error(w, errors.JWT_INVALID, http.StatusBadRequest)
+		return false
+	}
+
+	queryParams := r.URL.Query()
+	groupIdStr := queryParams.Get("groupId")
+	if groupIdStr == "" {
+		http.Error(w, errors.FRIEND_ID_NOT_FOUND, http.StatusBadRequest)
+		return false
+	}
+	groupId, err := strconv.Atoi(groupIdStr)
+	if err != nil {
+		http.Error(w, errors.FRIEND_ID_NOT_VALID, http.StatusBadRequest)
+		return false
+	}
+
+	rows, err := database.Query(db.GET_GROUP_MESSAGES, groupId)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rows.Close()
+
+	var messages []Message
+	for rows.Next() {
+		var message Message
+		var sentBytes []uint8
+		err := rows.Scan(&message.Id, &message.UserId, &message.ToId, &message.Message, &sentBytes)
+		message.Sent = string(sentBytes)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return false
+		}
+		messages = append(messages, message)
+	}
+
+	// Check Error on Rows
+	if err := rows.Err(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return false
+	}
+
+	// Send response to the client
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(messages)
+
+	return true
+}
+
 func GetUserMessage(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -77,8 +152,6 @@ func GetUserMessage(
 		return false
 	}
 
-	// Aca esta el error de porque vemos en la conversacion con luci
-	// La conversacion que tuve con Facu
 	rows, err := database.Query(db.GET_USER_MESSAGES, *id, *id, friendId, friendId)
 	if err != nil {
 		panic(err.Error())

@@ -36,6 +36,7 @@ export class User {
   ): Promise<User> {
     const user = new User(_id, _name, _email, _created_at, _jwt);
     await user.GetFriends();
+    await user.GetGroups();
     return user;
   }
 
@@ -75,10 +76,13 @@ export class User {
     }
   }
 
-  async GetMessages(user_b: number): Promise<Message[]|undefined> {
+  async GetMessages(user_b: number): Promise<Message[] | undefined> {
     try {
       const axiosConfig = this._GetAxiosConfig();
-      const { data } = await axios.get(SERVER_URL + `user-message?friendId=${user_b}`, axiosConfig)
+      const { data } = await axios.get(
+        SERVER_URL + `user-message?friendId=${user_b}`,
+        axiosConfig
+      );
       const messages = await Message.GetMessagesOf(data);
       return messages;
     } catch (err) {
@@ -100,7 +104,16 @@ export class User {
     }
   }
 
-  private async _GetGroups() {}
+  async GetGroups() {
+    try {
+      const axiosConfig = this._GetAxiosConfig();
+      const { data } = await axios.get(SERVER_URL + "friends", axiosConfig);
+      const f = await Friend.GetFriendsOf(this, data);
+      this.friends = f;
+    } catch (err) {
+      console.error("Error getting all the groups of this user. " + err);
+    }
+  }
 
   private _GetAxiosConfig(): AxiosRequestConfig {
     return {

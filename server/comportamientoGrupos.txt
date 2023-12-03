@@ -1,0 +1,6 @@
+Un usuario crea un grupo.
+Este usuario se convierte en el owner del grupo.
+
+Un usuario externo puede solicitar participar de este grupo.
+
+El owner puede aceptar o rechazar solicitudes de estos otros usuarios.
