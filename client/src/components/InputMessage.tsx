@@ -1,13 +1,56 @@
 import { ArrowForwardIcon } from "@chakra-ui/icons";
 import { Button, HStack, Input, Box, VStack } from "@chakra-ui/react";
 import React from "react";
+import { useProvider } from "../context";
+import { Message } from "../models/message";
 
-export const InputMessage = () => {
+interface IInputMessage {
+  socket: WebSocket | undefined;
+  friendId: string;
+  messages: Message[];
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+}
+
+export const InputMessage = ({
+  socket,
+  friendId,
+  messages,
+  setMessages,
+}: IInputMessage) => {
   // Attributes
   const [message, setMessage] = React.useState<string>("");
   // Context
+  const { user } = useProvider();
   // Methods
-  const handleSendMessage = async () => {};
+  const GetNewMessageId = () => {
+    if (!messages) return 1;
+    if (messages.length === 0) return 1;
+    return messages[messages.length - 1].id + 1;
+  };
+
+  const handleSendMessage = async () => {
+    if (!socket) return;
+    if (!user) return;
+    const obj = {
+      user_id: user.id,
+      is_group: false,
+      to_id: Number(friendId),
+      message: message,
+    };
+    const jsonString = JSON.stringify(obj);
+    socket.send(jsonString);
+    setMessages([
+      ...messages,
+      new Message(
+        GetNewMessageId(),
+        user.id,
+        Number(friendId),
+        message,
+        new Date().toISOString()
+      ),
+    ]);
+    setMessage("");
+  };
   // Component
   return (
     <VStack w="full">

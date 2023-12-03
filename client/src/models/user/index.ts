@@ -2,6 +2,7 @@ import { SERVER_URL } from "@/src/handlers/server";
 import { Group } from "../group";
 import axios, { AxiosRequestConfig } from "axios";
 import { Friend } from "../friend";
+import { Message } from "../message";
 
 export class User {
   id: number;
@@ -34,9 +35,22 @@ export class User {
     _jwt?: string
   ): Promise<User> {
     const user = new User(_id, _name, _email, _created_at, _jwt);
-    await user._GetFriends()
+    await user.GetFriends();
     return user;
-  };
+  }
+
+  static async CreateUserWithMessages(
+    owner: User,
+    _id: number,
+    _name: string,
+    _email: string,
+    _created_at: string,
+    _jwt?: string
+  ): Promise<User> {
+    const user = new User(_id, _name, _email, _created_at, _jwt);
+
+    return user;
+  }
 
   static async Login(
     email: string,
@@ -49,13 +63,33 @@ export class User {
         email,
         password,
       });
-      return await this.CreateUserWithData(user.id, user.name, user.email, user.created_at, jwt);
+      return await this.CreateUserWithData(
+        user.id,
+        user.name,
+        user.email,
+        user.created_at,
+        jwt
+      );
     } catch (err) {
       return;
     }
   }
 
-  async _GetFriends() {
+  async GetMessages(user_b: number): Promise<Message[]|undefined> {
+    try {
+      const axiosConfig = this._GetAxiosConfig();
+      const { data } = await axios.get(SERVER_URL + "user-message", axiosConfig)
+      const messages = await Message.GetMessagesOf(data);
+      return messages;
+    } catch (err) {
+      console.error(
+        `Error getting the messages of user_a (${this.id}) and user_b (${user_b}).`
+      );
+      return;
+    }
+  }
+
+  async GetFriends() {
     try {
       const axiosConfig = this._GetAxiosConfig();
       const { data } = await axios.get(SERVER_URL + "friends", axiosConfig);

@@ -35,6 +35,8 @@ func main() {
 	}
 
 	// Define handlers to endpoints
+	http.HandleFunc("/", types.GetTemplate().ServeHTTP)
+
 	http.HandleFunc("/user", func(w http.ResponseWriter, r *http.Request) {
 		types.HandleUser(w, r, database)
 	})
@@ -65,6 +67,10 @@ func main() {
 
 	http.HandleFunc("/acept-group", func(w http.ResponseWriter, r *http.Request) {
 		types.AcceptGroupRequest(w, r, database)
+	})
+
+	http.HandleFunc("/user-message", func(w http.ResponseWriter, r *http.Request) {
+		types.HandleUserMessage(w, r, database)
 	})
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
