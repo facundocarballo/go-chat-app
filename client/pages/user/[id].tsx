@@ -53,32 +53,11 @@ export default function Friend() {
   };
 
   React.useEffect(() => {
-    if (!readed) {
+    // if (!readed) {
       handleGetFriend();
       handleConnectSocket();
-      readed = true;
-    }
-  });
-
-  React.useEffect(() => {
-    // handleConnectSocket();
-    // console.log("hola...");
-    // const socket = io('http://localhost:3690')
-    // console.log(socket)
-    // // Manejar eventos del WebSocket
-    // socket.on("connect", () => {
-    //   console.log("Conectado al servidor WebSocket");
-    // });
-    // socket.on("message", (data) => {
-    //   console.log("Mensaje del servidor:", data);
-    // });
-    // socket.on("disconnect", () => {
-    //   console.log("Desconectado del servidor WebSocket");
-    // });
-    // // Limpiar la conexión al desmontar el componente
-    // return () => {
-    //   socket.disconnect();
-    // };
+      // readed = true;
+    // }
   }, []);
   // Component
   return (

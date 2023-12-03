@@ -52,6 +52,7 @@ export default function Home() {
         </AlertDialogOverlay>
       </AlertDialog>
 
+      <Box h="10px" />
       <Friends />
       <Box h="20px" />
       <Divider />

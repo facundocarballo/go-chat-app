@@ -63,7 +63,7 @@ export const FriendChat = ({
   if (!user) return null;
   if (!messages) return null;
   return (
-    <VStack w="full">
+    <VStack w="full" h='660px' scrollBehavior='smooth' overflowY='scroll'>
       {messages?.map((m) => (
         <ShowMessage message={m.message} owner={user.id == m.sender_id} />
       ))}

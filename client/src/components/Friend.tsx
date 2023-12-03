@@ -11,7 +11,7 @@ export const Friend = ({ name, email }: IFriend) => {
   // Methods
   // Component
   return (
-    <VStack w="300px" bg="primary" borderRadius={10}>
+    <VStack w="200px" bg="primary" borderRadius={10}>
       <Box h="5px" />
       <HStack w="full">
         <Box w="10px" />

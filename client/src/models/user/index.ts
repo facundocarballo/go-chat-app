@@ -78,7 +78,7 @@ export class User {
   async GetMessages(user_b: number): Promise<Message[]|undefined> {
     try {
       const axiosConfig = this._GetAxiosConfig();
-      const { data } = await axios.get(SERVER_URL + "user-message", axiosConfig)
+      const { data } = await axios.get(SERVER_URL + `user-message?friendId=${user_b}`, axiosConfig)
       const messages = await Message.GetMessagesOf(data);
       return messages;
     } catch (err) {
