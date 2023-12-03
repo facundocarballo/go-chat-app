@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/facundocarballo/go-chat-app/crypto"
 	"github.com/facundocarballo/go-chat-app/db"
@@ -64,7 +65,21 @@ func GetUserMessage(
 		return false
 	}
 
-	rows, err := database.Query(db.GET_USER_MESSAGES, *id, *id)
+	queryParams := r.URL.Query()
+	friendIdStr := queryParams.Get("friendId")
+	if friendIdStr == "" {
+		http.Error(w, errors.FRIEND_ID_NOT_FOUND, http.StatusBadRequest)
+		return false
+	}
+	friendId, err := strconv.Atoi(friendIdStr)
+	if err != nil {
+		http.Error(w, errors.FRIEND_ID_NOT_VALID, http.StatusBadRequest)
+		return false
+	}
+
+	// Aca esta el error de porque vemos en la conversacion con luci
+	// La conversacion que tuve con Facu
+	rows, err := database.Query(db.GET_USER_MESSAGES, *id, *id, friendId, friendId)
 	if err != nil {
 		panic(err.Error())
 	}

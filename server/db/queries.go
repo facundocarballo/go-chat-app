@@ -8,7 +8,7 @@ const GET_USER_BY_ID = "SELECT id, name, email, created_at FROM User WHERE id = 
 
 // User Messages
 const INSERT_USER_MESSAGE = "CALL InsertUserMessage(?, ?, ?)"
-const GET_USER_MESSAGES = "SELECT * FROM UserMessage WHERE user_from = (?) OR user_to = (?)"
+const GET_USER_MESSAGES = "SELECT * FROM UserMessage WHERE (user_from = (?) OR user_to = (?)) AND (user_from = (?) OR user_to = (?))"
 
 // Friend Request
 const INSERT_FRIEND_REQUEST = "CALL CreateFriendRequest(?, ?)"
