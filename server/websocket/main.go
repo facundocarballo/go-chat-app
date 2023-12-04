@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/facundocarballo/go-chat-app/crypto"
 	"github.com/facundocarballo/go-chat-app/db"
@@ -45,7 +46,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request, database *sql.DB) {
 	client := types.CreateClient(conn, *id, groups)
 	clients[client] = true
 
-	println("Conectado..")
+	println("Client [" + strconv.Itoa(client.Id) + "] Connected")
 
 	defer func() {
 		conn.Close()
@@ -58,24 +59,19 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request, database *sql.DB) {
 			println(err)
 			return
 		}
-		println("Leemos un mensaje: ", string(p))
 		message := types.BodyToMessage(p)
 		if message == nil {
 			panic("Message is nil.")
 		}
-		println("Ya tenemos la estructura mensaje.")
-		println(message)
 		var res bool
 		if message.IsGroup {
-			println("Es un mensaje para un grupo.")
 			res = InsertGroupMessage(*id, message, database)
 		} else {
-			println("Es un mensaje para un usuario en particular.")
 			res = InsertUserMessage(*id, message, database)
 		}
 
 		if !res {
-			message.Message = "Error sending the message: " + message.Message
+			println("Error sending the message.")
 		}
 
 		broadcast <- message
@@ -84,22 +80,26 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request, database *sql.DB) {
 
 func HandleMessages() {
 	for {
-		println("[HandleMessages] Looking for messages..")
+		println("[HandleMessages] Looking for messages.")
 		message := <-broadcast
-		println("[HandleMessages] Message getted..")
+		println("[HandleMessages] Message getted.")
 
 		for client := range clients {
-			println("[HandleMessages] Looking for the correct client..")
-			if HaveToReceiveThisMessage(message, *client) {
-				println("Vamos a enviar el mensaje...")
+			println("[HandleMessages] Looking for the correct client.")
+			if HaveToReceiveThisMessage(message, client) {
+				println("[HandleMessages] Sending message to client.")
 				SendMessage(client, message)
 			}
 		}
 	}
 }
 
-func HaveToReceiveThisMessage(message *types.Message, client types.Client) bool {
-	return (message.IsGroup && client.BelongToThisGroup(message.ToId)) || message.ToId == client.Id
+func HaveToReceiveThisMessage(message *types.Message, client *types.Client) bool {
+	if message.IsGroup {
+		return client.BelongToThisGroup(message.ToId) && client.Id != message.UserId
+	} else {
+		return message.ToId == client.Id
+	}
 }
 
 func SendMessage(client *types.Client, message *types.Message) {

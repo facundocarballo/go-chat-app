@@ -36,7 +36,7 @@ export const InputMessage = ({
     const obj = {
       user_id: user.id,
       is_group: isGroup,
-      toId: Number(toId),
+      to_id: Number(toId),
       message: message,
     };
     const jsonString = JSON.stringify(obj);
