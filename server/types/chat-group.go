@@ -109,7 +109,7 @@ func GetGroups(
 		return false
 	}
 
-	rows, err := database.Query(db.GET_GROUPS)
+	rows, err := database.Query(db.GET_GROUPS, *id)
 	if err != nil {
 		panic(err.Error())
 	}

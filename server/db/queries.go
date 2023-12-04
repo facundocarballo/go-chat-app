@@ -30,7 +30,7 @@ const GET_GROUP_REQUEST_SENTED = "SELECT * FROM GroupRequest WHERE user_id = (?)
 // Groups
 const CREATE_GROUP = "CALL CreateChatGroup(?, ?, ?)"
 const GET_GROUP_USERS = "SELECT U.id, U.name, U.email FROM User U INNER JOIN UserChatGroup UCG ON U.id = UCG.user_id WHERE group_id = (?)"
-const GET_GROUPS = "SELECT id, name, description, sent, owner FROM ChatGroup"
+const GET_GROUPS = "SELECT * FROM ChatGroup CG WHERE CG.id IN ( SELECT UCG.group_id FROM UserChatGroup UCG WHERE UCG.user_id = (?))"
 const GET_GROUPS_OF_USER = "SELECT group_id FROM UserChatGroup WHERE user_id = (?)"
 const GET_GROUP_OWNER = "SELECT owner FROM ChatGroup WHERE id = (?)"
 
