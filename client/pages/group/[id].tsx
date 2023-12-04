@@ -10,32 +10,32 @@ import {
   Spacer,
   VStack,
 } from "@chakra-ui/react";
-import { User } from "@/src/models/user";
 import { useRouter } from "next/router";
 import { InputMessage } from "@/src/components/InputMessage";
 import { ChevronLeftIcon } from "@chakra-ui/icons";
 import { Chat } from "@/src/subpages/Chat";
 import { Message } from "@/src/models/message";
 import NextLink from "next/link";
+import { Group } from "@/src/models/group";
 
 export default function Friend() {
   const router = useRouter();
   const url = router.asPath.split("/");
   // Attributes
-  const [friend, setFriend] = React.useState<User | undefined>(undefined);
+  const [group, setGroup] = React.useState<Group | undefined>(undefined);
   const [socket, setSocket] = React.useState<WebSocket | undefined>(undefined);
   const [messages, setMessages] = React.useState<Message[]>([]);
-  const friendId = url[url.length - 1];
+  const groupId = url[url.length - 1];
   // Context
   const { user } = useProvider();
   // Methods
   const handleGetFriend = () => {
-    if (!user || !user.friends) {
+    if (!user || !user.groups) {
       return;
     }
-    for (const f of user.friends) {
-      if (f.id.toString() === friendId) {
-        setFriend(f);
+    for (const group of user.groups) {
+      if (group.id.toString() === groupId) {
+        setGroup(group);
         return;
       }
     }
@@ -57,7 +57,7 @@ export default function Friend() {
   return (
     <>
       <Head>
-        <title>User</title>
+        <title>Group</title>
         <meta name="description" content="Golang Chat app" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
@@ -73,14 +73,14 @@ export default function Friend() {
             </Button>
           </NextLink>
           <Spacer />
-          <Heading>Chat with {friend?.name}</Heading>
+          <Heading>Chat with {group?.name}</Heading>
           <Spacer />
         </HStack>
         <Box h="10px" />
         <Divider />
         <Chat
-          toId={friendId}
-          isGroup={false}
+          toId={groupId}
+          isGroup={true}
           socket={socket}
           messages={messages}
           setMessages={setMessages}
@@ -88,8 +88,8 @@ export default function Friend() {
         <Box h="100px" />
         <InputMessage
           socket={socket}
-          isGroup={false}
-          toId={friendId}
+          isGroup={true}
+          toId={groupId}
           messages={messages}
           setMessages={setMessages}
         />

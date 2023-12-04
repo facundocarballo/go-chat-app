@@ -76,18 +76,19 @@ export class User {
     }
   }
 
-  async GetMessages(user_b: number): Promise<Message[] | undefined> {
+  async GetMessages(to_id: string, isGroup: boolean): Promise<Message[] | undefined> {
     try {
       const axiosConfig = this._GetAxiosConfig();
+      const query = isGroup ? "group-message?group_id=" : "user-message?friend_id="
       const { data } = await axios.get(
-        SERVER_URL + `user-message?friendId=${user_b}`,
+        SERVER_URL + `${query}${to_id}`,
         axiosConfig
       );
-      const messages = await Message.GetMessagesOf(data);
+      const messages = Message.GetMessagesOf(data);
       return messages;
     } catch (err) {
       console.error(
-        `Error getting the messages of user_a (${this.id}) and user_b (${user_b}).`
+        `Error getting the messages of user_a (${this.id}) and to_id (${to_id}).`
       );
       return;
     }

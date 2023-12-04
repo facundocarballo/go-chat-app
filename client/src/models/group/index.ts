@@ -48,7 +48,7 @@ export class Group {
     let users: User[] = [];
     try {
       const { data } = await axios.get(
-        SERVER_URL + `group-users?group_id${id}`
+        SERVER_URL + `group-users?group_id=${id}`
       );
       for (const u of data) {
         users.push(

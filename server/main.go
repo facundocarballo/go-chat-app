@@ -78,7 +78,7 @@ func main() {
 	})
 
 	http.HandleFunc("/group-message", func(w http.ResponseWriter, r *http.Request) {
-		types.HandleUserMessage(w, r, database)
+		types.HandleGroupMessage(w, r, database)
 	})
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {

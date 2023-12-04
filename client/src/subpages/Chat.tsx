@@ -4,25 +4,27 @@ import { Message } from "../models/message";
 import { VStack } from "@chakra-ui/react";
 import { ShowMessage } from "../components/ShowMessage";
 
-interface IFriendChat {
+interface IChat {
   socket: WebSocket | undefined;
-  friendId: string;
+  isGroup: boolean;
+  toId: string;
   messages: Message[];
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
 }
-export const FriendChat = ({
+export const Chat = ({
   socket,
-  friendId,
+  isGroup,
+  toId,
   messages,
   setMessages,
-}: IFriendChat) => {
+}: IChat) => {
   // Attributes
   // Context
   const { user } = useProvider();
   // Methods
   const handleGetMessages = async () => {
     if (!user) return;
-    const m = await user.GetMessages(Number(friendId));
+    const m = await user.GetMessages(toId, isGroup);
     if (!m) return;
     setMessages(m);
   };
@@ -43,7 +45,7 @@ export const FriendChat = ({
         ...messages,
         new Message(
           GetNewMessageId(),
-          Number(friendId),
+          Number(toId),
           user.id,
           json.message,
           new Date().toISOString()

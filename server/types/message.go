@@ -79,7 +79,7 @@ func GetGroupMessage(
 	}
 
 	queryParams := r.URL.Query()
-	groupIdStr := queryParams.Get("groupId")
+	groupIdStr := queryParams.Get("group_id")
 	if groupIdStr == "" {
 		http.Error(w, errors.FRIEND_ID_NOT_FOUND, http.StatusBadRequest)
 		return false
@@ -141,7 +141,7 @@ func GetUserMessage(
 	}
 
 	queryParams := r.URL.Query()
-	friendIdStr := queryParams.Get("friendId")
+	friendIdStr := queryParams.Get("friend_id")
 	if friendIdStr == "" {
 		http.Error(w, errors.FRIEND_ID_NOT_FOUND, http.StatusBadRequest)
 		return false

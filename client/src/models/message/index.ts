@@ -1,6 +1,3 @@
-import { Group } from "../group";
-import { User } from "../user";
-
 export class Message {
   id: number;
   sender_id: number;
@@ -23,6 +20,7 @@ export class Message {
   }
 
   static GetMessagesOf(data: any[]): Message[] {
+    if (data == null) return [];
     let messages: Message[] = [];
     for (const m of data) {
       messages.push(new Message(m.id, m.user_id, m.to_id, m.message, m.sent));

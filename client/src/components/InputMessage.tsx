@@ -6,14 +6,16 @@ import { Message } from "../models/message";
 
 interface IInputMessage {
   socket: WebSocket | undefined;
-  friendId: string;
+  isGroup: boolean;
+  toId: string;
   messages: Message[];
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
 }
 
 export const InputMessage = ({
   socket,
-  friendId,
+  isGroup,
+  toId,
   messages,
   setMessages,
 }: IInputMessage) => {
@@ -33,8 +35,8 @@ export const InputMessage = ({
     if (!user) return;
     const obj = {
       user_id: user.id,
-      is_group: false,
-      to_id: Number(friendId),
+      is_group: isGroup,
+      toId: Number(toId),
       message: message,
     };
     const jsonString = JSON.stringify(obj);
@@ -44,7 +46,7 @@ export const InputMessage = ({
       new Message(
         GetNewMessageId(),
         user.id,
-        Number(friendId),
+        Number(toId),
         message,
         new Date().toISOString()
       ),
