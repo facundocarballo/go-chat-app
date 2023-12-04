@@ -107,9 +107,9 @@ export class User {
   async GetGroups() {
     try {
       const axiosConfig = this._GetAxiosConfig();
-      const { data } = await axios.get(SERVER_URL + "friends", axiosConfig);
-      const f = await Friend.GetFriendsOf(this, data);
-      this.friends = f;
+      const { data } = await axios.get(SERVER_URL + "group", axiosConfig);
+      const groups = await Group.GetGroupsBy(data);
+      this.groups = groups;
     } catch (err) {
       console.error("Error getting all the groups of this user. " + err);
     }

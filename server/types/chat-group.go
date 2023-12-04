@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/facundocarballo/go-chat-app/crypto"
 	"github.com/facundocarballo/go-chat-app/db"
@@ -142,6 +143,63 @@ func GetGroups(
 	return true
 }
 
+func GetGroupUsers(
+	w http.ResponseWriter,
+	r *http.Request,
+	database *sql.DB,
+) bool {
+	// tokenString := crypto.GetJWTFromRequest(w, r)
+	// if tokenString == nil {
+	// 	http.Error(w, errors.JWT_NOT_FOUND, http.StatusBadRequest)
+	// 	return false
+	// }
+
+	// id := crypto.GetIdFromJWT(*tokenString)
+	// if id == nil {
+	// 	http.Error(w, errors.JWT_INVALID, http.StatusBadRequest)
+	// 	return false
+	// }
+
+	queryParams := r.URL.Query()
+	groupIdString := queryParams.Get("group_id")
+	groupId, err := strconv.Atoi(groupIdString)
+	if err != nil {
+		http.Error(w, errors.ATOI, http.StatusBadRequest)
+		return false
+	}
+
+	rows, err := database.Query(db.GET_GROUP_USERS, groupId)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rows.Close()
+
+	// Iterate Rows
+	var users []User
+	for rows.Next() {
+		var user User
+		err := rows.Scan(&user.Id, &user.Name, &user.Email)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return false
+		}
+		users = append(users, user)
+	}
+
+	// Check Error on Rows
+	if err := rows.Err(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return false
+	}
+
+	// Send response to the client
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(users)
+
+	return true
+}
+
 func GetGroupOwner(id int, database *sql.DB) *int {
 	rows, err := database.Query(db.GET_GROUP_OWNER, id)
 	if err != nil {
@@ -203,4 +261,13 @@ func HandleGroups(w http.ResponseWriter, r *http.Request, database *sql.DB) {
 	}
 
 	http.Error(w, "Method not allowed to /groups", http.StatusMethodNotAllowed)
+}
+
+func HandleGroupUsers(w http.ResponseWriter, r *http.Request, database *sql.DB) {
+	if r.Method == http.MethodGet {
+		GetGroupUsers(w, r, database)
+		return
+	}
+
+	http.Error(w, "Method not allowed to /group-users", http.StatusMethodNotAllowed)
 }

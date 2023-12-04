@@ -65,6 +65,10 @@ func main() {
 		types.HandleGroups(w, r, database)
 	})
 
+	http.HandleFunc("/group-users", func(w http.ResponseWriter, r *http.Request) {
+		types.HandleGroupUsers(w, r, database)
+	})
+
 	http.HandleFunc("/accept-group", func(w http.ResponseWriter, r *http.Request) {
 		types.HandleAcceptGroupRequest(w, r, database)
 	})
