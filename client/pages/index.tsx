@@ -1,6 +1,5 @@
 import Head from "next/head";
 import React from "react";
-import { Inter } from "next/font/google";
 import { useProvider } from "@/src/context";
 import {
   AlertDialog,
