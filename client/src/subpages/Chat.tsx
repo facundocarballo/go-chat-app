@@ -65,9 +65,9 @@ export const Chat = ({
   if (!user) return null;
   if (!messages) return null;
   return (
-    <VStack w="full" h='660px' scrollBehavior='smooth' overflowY='scroll'>
+    <VStack w="full" h='690px' scrollBehavior='smooth' overflowY='scroll'>
       {messages?.map((m) => (
-        <ShowMessage message={m.message} owner={user.id == m.sender_id} />
+        <ShowMessage sender={m.sender_id} message={m.message} owner={user.id == m.sender_id} />
       ))}
     </VStack>
   );

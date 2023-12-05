@@ -57,7 +57,7 @@ export const InputMessage = ({
   return (
     <VStack w="full">
       <HStack w="full">
-        <Box w="10px" />
+        <Box w="10px"/>
         <HStack w="full" bg="black" borderRadius={10}>
           <Input
             placeholder="Write your message here..."

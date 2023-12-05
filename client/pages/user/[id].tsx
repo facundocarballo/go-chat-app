@@ -72,11 +72,9 @@ export default function Friend() {
               <ChevronLeftIcon />
             </Button>
           </NextLink>
-          <Spacer />
           <Heading>Chat with {friend?.name}</Heading>
           <Spacer />
         </HStack>
-        <Box h="10px" />
         <Divider />
         <Chat
           toId={friendId}
@@ -85,7 +83,7 @@ export default function Friend() {
           messages={messages}
           setMessages={setMessages}
         />
-        <Box h="100px" />
+        <Box h={{lg: "100px", base: "10px"}} />
         <InputMessage
           socket={socket}
           isGroup={false}

@@ -41,7 +41,6 @@ export class User {
   }
 
   static async CreateUserWithMessages(
-    owner: User,
     _id: number,
     _name: string,
     _email: string,
@@ -49,7 +48,6 @@ export class User {
     _jwt?: string
   ): Promise<User> {
     const user = new User(_id, _name, _email, _created_at, _jwt);
-
     return user;
   }
 
