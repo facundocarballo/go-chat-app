@@ -42,7 +42,20 @@ export default function Friend() {
   };
 
   const handleConnectSocket = async () => {
-    const s = new WebSocket("ws://localhost:3690/ws?jwt=" + user?.jwt);
+    if (!user) return;
+    const s = new WebSocket("ws://localhost:3690/ws");
+
+    s.onopen = function () {
+      const obj = {
+        user_id: user.id,
+        is_jwt: true,
+        is_group: false,
+        to_id: -1,
+        message: user.jwt,
+      };
+      const jsonString = JSON.stringify(obj);
+      s.send(jsonString);
+    }
     s.onclose = function () {
       alert("Connection has been closed.");
     };

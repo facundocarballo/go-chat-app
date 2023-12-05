@@ -26,15 +26,6 @@ var clients = make(map[*types.Client]bool)
 var broadcast = make(chan *types.Message)
 
 func HandleWebSocket(w http.ResponseWriter, r *http.Request, database *sql.DB) {
-	tokenString := r.URL.Query().Get("jwt")
-
-	id := crypto.GetIdFromJWT(tokenString)
-	if id == nil {
-		println("JWT INVALID")
-		http.Error(w, errors.JWT_INVALID, http.StatusBadRequest)
-		return
-	}
-
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		println("Error al hacer el Upgrade.")
@@ -42,13 +33,14 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request, database *sql.DB) {
 		return
 	}
 
-	groups := types.GetGropusOfUser(*id, database)
-	client := types.CreateClient(conn, *id, groups)
+	var groups []int
+	client := types.CreateClient(conn, -1, groups)
 	clients[client] = true
 
 	println("Client [" + strconv.Itoa(client.Id) + "] Connected")
 
 	defer func() {
+		println("Cerramos la conexion y eliminamos al cliente. " + "Client [" + strconv.Itoa(client.Id) + "]")
 		conn.Close()
 		delete(clients, client)
 	}()
@@ -63,11 +55,29 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request, database *sql.DB) {
 		if message == nil {
 			panic("Message is nil.")
 		}
+
+		if message.IsJWT {
+			id := crypto.GetIdFromJWT(message.Message)
+			if id == nil {
+				println("JWT INVALID")
+				return
+			}
+			client.Id = *id
+			groups := types.GetGropusOfUser(*id, database)
+			client.Groups = groups
+			continue
+		}
+
+		if client.Id == -1 {
+			println("No puedes enviar nada todavia, porque no tienes el JWT.")
+			continue
+		}
+
 		var res bool
 		if message.IsGroup {
-			res = InsertGroupMessage(*id, message, database)
+			res = InsertGroupMessage(client.Id, message, database)
 		} else {
-			res = InsertUserMessage(*id, message, database)
+			res = InsertUserMessage(client.Id, message, database)
 		}
 
 		if !res {

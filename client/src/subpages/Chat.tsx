@@ -45,8 +45,8 @@ export const Chat = ({
         ...messages,
         new Message(
           GetNewMessageId(),
+          json.user_id,
           Number(toId),
-          user.id,
           json.message,
           new Date().toISOString()
         ),

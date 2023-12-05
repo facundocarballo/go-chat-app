@@ -35,6 +35,7 @@ export const InputMessage = ({
     if (!user) return;
     const obj = {
       user_id: user.id,
+      is_jwt: false,
       is_group: isGroup,
       to_id: Number(toId),
       message: message,
