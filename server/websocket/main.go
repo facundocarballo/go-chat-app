@@ -40,7 +40,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request, database *sql.DB) {
 	println("Client [" + strconv.Itoa(client.Id) + "] Connected")
 
 	defer func() {
-		println("Cerramos la conexion y eliminamos al cliente. " + "Client [" + strconv.Itoa(client.Id) + "]")
+		println("Closing the connection and deleting the client. " + "Client [" + strconv.Itoa(client.Id) + "]")
 		conn.Close()
 		delete(clients, client)
 	}()
@@ -60,7 +60,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request, database *sql.DB) {
 			id := crypto.GetIdFromJWT(message.Message)
 			if id == nil {
 				println("JWT INVALID")
-				return
+				continue
 			}
 			client.Id = *id
 			groups := types.GetGropusOfUser(*id, database)
@@ -69,7 +69,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request, database *sql.DB) {
 		}
 
 		if client.Id == -1 {
-			println("No puedes enviar nada todavia, porque no tienes el JWT.")
+			println("Client can't send messages, first have to provide the JWT.")
 			continue
 		}
 
