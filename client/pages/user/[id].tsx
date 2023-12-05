@@ -56,9 +56,11 @@ export default function Friend() {
       const jsonString = JSON.stringify(obj);
       s.send(jsonString);
     }
+
     s.onclose = function () {
       alert("Connection has been closed.");
     };
+    
     setSocket(s);
   };
 
