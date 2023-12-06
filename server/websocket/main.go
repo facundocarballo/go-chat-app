@@ -99,6 +99,7 @@ func HandleMessages() {
 			if HaveToReceiveThisMessage(message, client) {
 				println("[HandleMessages] Sending message to client.")
 				SendMessage(client, message)
+				continue
 			}
 		}
 	}
@@ -115,13 +116,13 @@ func HaveToReceiveThisMessage(message *types.Message, client *types.Client) bool
 func SendMessage(client *types.Client, message *types.Message) {
 	b, err := json.Marshal(message)
 	if err != nil {
-		log.Println(err)
+		log.Println("Error wrapping the message to bytes. " + err.Error())
 		client.Conn.Close()
 		delete(clients, client)
 	}
 	err = client.Conn.WriteMessage(websocket.TextMessage, b)
 	if err != nil {
-		log.Println(err)
+		log.Println("Error writting the message into the Web Socket. ", err.Error())
 		client.Conn.Close()
 		delete(clients, client)
 	}
