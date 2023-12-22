@@ -6,7 +6,7 @@ The idea is to show how Web Sockets help us bidirectional communication with two
 
 ## Server - Golang
 
-Go to the **server** folder to see in detail how to implement the server that handle Web Sockets connections.
+Go to the **server** folder to see in detail how to implement the server that handles Web Sockets connections.
 
 ## Client - NextJS App
 
@@ -14,5 +14,5 @@ Go to the **client** folder to see in detail how to implement a client that conn
 
 ## Links to the video
 
-- English ()
-- Spanish ()
+- English (https://youtu.be/S8zFscByVOA?si=TnjuKKl9HwiuXyEz)
+- Spanish (https://youtu.be/3LNIXVKGezo?si=SgWKbdvVVUbf4YSy)
